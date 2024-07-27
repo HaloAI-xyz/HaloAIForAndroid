@@ -46,7 +46,19 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/assistant_widget_info" />
         </receiver>
-
+<!--        Required for Microsoft Graph API  saml authentication-->
+        <activity android:name="com.microsoft.identity.client.BrowserTabActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:host="xyz.haloai.haloai_android_productivity"
+                    android:path="/3CjccyHQ2pL66qQ+M/QW4ABYPVs="
+                    android:scheme="msauth" />
+            </intent-filter>
+        </activity>
         <receiver
             android:name=".ui.widgets.CatchUpWidgetReceiver"
             android:exported="true"

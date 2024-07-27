@@ -1,14 +1,13 @@
 {
   "client_id" : "e9ab6717-815a-48e0-ba03-f38132513720",
-  "authorization_user_agent" : "WEBVIEW",
-  "redirect_uri" : "msauth://xyz.haloai.haloai_android_productivity/Rdv8NPEh3VmvQCfOfhXThlWfG%2BE%3D",
-  "account_mode" : "MULTIPLE",
+  "authorization_user_agent" : "DEFAULT",
+  "redirect_uri" : "msauth://xyz.haloai.haloai_android_productivity/3CjccyHQ2pL66qQ%2BM%2FQW4ABYPVs%3D",
   "authorities" : [
     {
       "type": "AAD",
       "audience": {
-        "type": "AzureADMyOrg",
-        "tenant_id": "b6acbd90-a0c3-41b9-9046-60c29f97927b"
+        "type": "AzureADMultipleOrgs",
+        "tenant_id": "organizations"
       }
     }
   ]

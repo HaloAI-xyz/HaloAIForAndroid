@@ -43,13 +43,13 @@ class AssistantModeFunctions(private val context: Context): KoinComponent {
         val currentDateTime = getCurrentTimeFormatted()
         val output = openAIViewModel.getChatGPTResponse(
             "You are a helpful personal assistant. You are a productivity focused assistant, with access to the following functions:  \n" +
-                    "1. create_reminder(string reminderText, string dateAndTimeForReminder): This will create a reminder with the given text at the given time. The datetime should be in \"YYYY-MM-DD HH:MM:SS\" format.\n" +
-                    "2. create_unscheduled_reminder(string reminderText): This will create an unscheduled reminder. \n" +
-                    "3. respond_to_user(string responseText): This will send the response back to the user. Use it to ask for details or tell the user what you did. Keep it brief and concise.  \n" +
-                    "4. get_note_titles(): Gets a note title. [Will return a string value]  \n" +
-                    "5. add_to_note(string noteText, string noteTitle): Adds the noteText to the note with title noteTitle.  \n" +
-                    "6. ask_ai(string prompt): Use this to ask an AI Agent to perform a task. [Will return a string value]  \n" +
-                    "7. summarize_text(): Give a summary of the text which can be used for notes or general description of tasks and events. [ returns a string value] \n" +
+                    "1. create_reminder(string reminderText, string dateAndTimeForReminder): This will create a reminder with the given text at the given time. The datetime should be in \"YYYY-MM-DD HH:MM:SS\" format.[Returns nothing] \n" +
+                    "2. create_unscheduled_reminder(string reminderText): This will create an unscheduled reminder.[Returns nothing] \n" +
+                    "3. respond_to_user(string responseText): This will send the response back to the user. Use it to ask for details or tell the user what you did. Keep it brief and concise. [Returns string output] \n" +
+//                    "4. get_note_titles(): Gets a note title. [Will return a string value]  \n" +
+                    "5. add_to_note(string noteText, string noteTitle): Adds the noteText to the note with title noteTitle. [Returns nothing] \n" +
+                    "6. ask_ai(string prompt): Use this to ask an AI Agent to perform a task. [Returns a string output]  \n" +
+                    "7. summarize_text(string inputText): Give a summary of the text which can be used for notes or general description of tasks and events. [ returns a string value] \n" +
                     "8. create_lt_goal(string goalText, string deadline): Returns nothing.\n" +
                     "This will create a long term goal (things like studying for giving the GRE, " +
                     "learning a new instrument, planning to study for an exam, etc. are long-term " +
@@ -259,11 +259,11 @@ class AssistantModeFunctions(private val context: Context): KoinComponent {
     suspend fun askAi(prompt: String): String {
         return openAIViewModel.getChatGPTResponse(
             "INSTRUCTIONS: You will be given the task to perform. Only respond with the exact required output. Don't use any additional formatting.",
-            prompt
+            prompt,modelToUse = "gpt-4o-mini"
         )
     }
 
-    fun summarizeText(): String {
+    fun summarizeText(prompt:String): String {
         return "Summary of the text"
     }
 
@@ -355,7 +355,12 @@ class AssistantModeFunctions(private val context: Context): KoinComponent {
                 val funcName = matcher_1.group(2)
                 val args = matcher_1.group(3)
 
-                val argsList = args.split(",").map { it.trim().trim('"') }
+//                val argsList = args.split(",").map { it.trim().trim('"') }
+                val argsList = if (funcName == "respond_to_user") {
+                    listOf(args.trim().trim('"'))
+                } else {
+                    args.split(",").map { it.trim().trim('"') }
+                }
                 val paramsMap = argsList.mapIndexed { index, arg -> "arg$index" to arg }.toMap()
 
                 val functionType = getFunctionType(input = funcName)
@@ -374,10 +379,17 @@ class AssistantModeFunctions(private val context: Context): KoinComponent {
 
                 // val argsList = args.split(",").map { it.trim().trim('"') }
                 val pattern = Regex("""\$\d+|".*?"""") // Matches $1, $2, $3, etc. and "string"
-                val argsList = pattern.findAll(args?.toString() ?: "").map { match ->
-                    match.value.trim('"')
-                }.toList()
-
+//                val argsList = pattern.findAll(args?.toString() ?: "").map { match ->
+//                    match.value.trim('"')
+//                }.toList()
+                val argsList = if (funcName == "respond_to_user") {
+                    listOf(args.trim().trim('"'))
+                } else {
+                    val pattern = Regex("""\$\d+|".*?"""") // Matches $1, $2, $3, etc. and "string"
+                    pattern.findAll(args?.toString() ?: "").map { match ->
+                        match.value.trim('"')
+                    }.toList()
+                }
                 val paramsMap = argsList.mapIndexed { index, arg -> "arg$index" to arg }.toMap()
 
                 val functionType = getFunctionType(input = funcName)

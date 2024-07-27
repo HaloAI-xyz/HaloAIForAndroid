@@ -81,7 +81,7 @@ class AssistantModeFunctionsImpl(private val assistantModeFunctions: AssistantMo
                     )
                 }
                 EnumFunctionTypes.SUMMARIZE_TEXT -> {
-                    variableMap[instruction.varNumberToStoreIn!!] = assistantModeFunctions.summarizeText()
+                    variableMap[instruction.varNumberToStoreIn!!] = assistantModeFunctions.summarizeText(prompt = arguments[0].toString())
                 }
                 EnumFunctionTypes.ASK_AI -> {
                     variableMap[instruction.varNumberToStoreIn!!] = assistantModeFunctions.askAi(prompt = arguments[0].toString())
